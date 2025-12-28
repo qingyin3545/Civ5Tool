@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 
 from pages.basic_page import BasicPage
-from pages.translate_page import TranslatePage
+from pages.translate_page import TranslationPage
 from i18n_manager import I18N
 
 
@@ -14,7 +14,7 @@ class CivToolApp(tk.Tk):
         self.notebook.pack(fill="both", expand=True)
 
         self.basic_page = BasicPage(self.notebook, self.refresh_ui_language)
-        self.translate_page = TranslatePage(self.notebook)
+        self.translate_page = TranslationPage(self.notebook)
 
         self.notebook.add(self.basic_page, text=I18N.t("tab.basic"))
         self.notebook.add(self.translate_page, text=I18N.t("tab.translate"))
