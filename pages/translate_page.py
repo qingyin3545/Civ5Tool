@@ -49,12 +49,19 @@ class TranslationPage(tk.Frame):
         log_frame = tk.Frame(self)
         log_frame.pack(fill="both", expand=True, padx=10, pady=(0, 10))
 
+        scrollbar = tk.Scrollbar(log_frame)
+        scrollbar.pack(side="right", fill="y")
+
         self.log_text = tk.Text(
             log_frame,
             height=10,
-            state="disabled"
+            state="disabled",
+            yscrollcommand=scrollbar.set
         )
-        self.log_text.pack(fill="both", expand=True)
+        self.log_text.pack(side="left", fill="both", expand=True)
+        scrollbar.config(command=self.log_text.yview)
+
+        self.refresh_text()
 
     # ===== 浏览路径 =====
     def _browse_mod_path(self):

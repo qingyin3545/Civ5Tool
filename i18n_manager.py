@@ -19,5 +19,8 @@ class I18N:
         cls.current = "en_US" if cls.current == "zh_CN" else "zh_CN"
 
     @classmethod
-    def t(cls, key):
-        return cls._languages[cls.current].get(key, key)
+    def t(cls, key, **kwargs):
+        text = cls._languages[cls.current].get(key, key)
+        if kwargs:
+            return text.format(**kwargs)
+        return text

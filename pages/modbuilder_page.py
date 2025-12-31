@@ -65,12 +65,30 @@ class ModBuilderPage(tk.Frame):
         log_frame = tk.Frame(self)
         log_frame.pack(fill="both", expand=True, padx=10, pady=(0, 10))
 
+        scrollbar = tk.Scrollbar(log_frame)
+        scrollbar.pack(side="right", fill="y")
+
         self.log_text = tk.Text(
             log_frame,
             height=10,
-            state="disabled"
+            state="disabled",
+            yscrollcommand=scrollbar.set
         )
-        self.log_text.pack(fill="both", expand=True)
+        self.log_text.pack(side="left", fill="both", expand=True)
+        scrollbar.config(command=self.log_text.yview)
+        # buider输出灰色
+        self.log_text.tag_config("builder", foreground="gray")
+
+        # ===== 标签 =====
+        thanks_label = tk.Label(
+            self,
+            text="Special thanks: catgrep",
+            font=("Arial", 9),
+            fg="gray"
+        )
+        thanks_label.pack(side="bottom", pady=(0, 5))
+
+        self.refresh_text()
 
     # ===== 浏览输入文件（限定 .civ5proj） =====
     def _browse_input_file(self):
@@ -127,7 +145,7 @@ class ModBuilderPage(tk.Frame):
         # 在这里调用 civ5 mod builder 的 Python 构建逻辑
         # ===== stdout 重定向 =====
         old_stdout = sys.stdout
-        sys.stdout = StdoutToLogger(self.log)
+        sys.stdout = StdoutToLogger(self.log, tag="builder")
         try:
             builder = Builder()
             result = builder.build(
@@ -143,12 +161,15 @@ class ModBuilderPage(tk.Frame):
             sys.stdout = old_stdout
 
         # ===== 处理构建结果 =====
-        self.log(f"Output mod: {result.mod_dir}")
+        self.log(I18N.t("log.output_mod", mod_dir=result.mod_dir))
 
     # ===== 日志接口 =====
-    def log(self, message: str):
+    def log(self, message: str, tag: str | None = None):
         self.log_text.config(state="normal")
-        self.log_text.insert("end", message + "\n")
+        if tag:
+            self.log_text.insert("end", message + "\n", tag)
+        else:
+            self.log_text.insert("end", message + "\n")
         self.log_text.see("end")
         self.log_text.config(state="disabled")
 
