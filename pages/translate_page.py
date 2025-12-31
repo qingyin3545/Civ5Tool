@@ -4,6 +4,7 @@ from i18n_manager import I18N
 # 文件查找
 import os
 import shutil
+import xml.etree.ElementTree as ET
 import re
 # 模组生成
 from utils.modinfo import generate_modinfo
@@ -60,6 +61,8 @@ class TranslationPage(tk.Frame):
         )
         self.log_text.pack(side="left", fill="both", expand=True)
         scrollbar.config(command=self.log_text.yview)
+        # buider输出灰色
+        self.log_text.tag_config("civ5projexcept", foreground="gray")
 
         self.refresh_text()
 
@@ -104,15 +107,37 @@ class TranslationPage(tk.Frame):
 
     def _collect_translation_files(self, mod_path: str, output_dir: str) -> list[str]:
         collected_files = []
-
         for root, _, files in os.walk(mod_path):
+            # 查找该目录下的 .civ5proj 文件
+            proj_files = [f for f in files if f.lower().endswith(".civ5proj")]
+            allowed_files = set()
+            for proj_file in proj_files:
+                proj_path = os.path.join(root, proj_file)
+                try:
+                    tree = ET.parse(proj_path)
+                    root_elem = tree.getroot()
+                    # 注意 xmlns 可能影响查找，需要加上命名空间
+                    ns = {'msb': 'http://schemas.microsoft.com/developer/msbuild/2003'}
+                    for file_elem in root_elem.findall(".//msb:FileName", ns):
+                        file_rel = file_elem.text.replace("\\", os.sep)
+                        allowed_files.add(os.path.join(root, file_rel))
+                except Exception as e:
+                    self.log(f"Failed to parse {proj_path}: {e}")
+
             for file in files:
                 if not file.lower().endswith((".xml", ".sql")):
                     continue
 
                 src_path = os.path.join(root, file)
 
+                # 先检查是否有 Language_en_US
                 if not self._contains_language_en_us(src_path):
+                    continue
+
+                # 如果存在 .civ5proj，则只收集在 allowed_files 中的文件
+                if proj_files and src_path not in allowed_files:
+                    rel_path = os.path.relpath(src_path, mod_path)
+                    self.log(f"Skipped by .civ5proj: {rel_path}", tag="civ5projexcept")
                     continue
 
                 rel_path = os.path.relpath(src_path, mod_path)
@@ -146,9 +171,12 @@ class TranslationPage(tk.Frame):
         return False
 
     # ===== 日志接口 =====
-    def log(self, message: str):
+    def log(self, message: str, tag: str | None = None):
         self.log_text.config(state="normal")
-        self.log_text.insert("end", message + "\n")
+        if tag:
+            self.log_text.insert("end", message + "\n", tag)
+        else:
+            self.log_text.insert("end", message + "\n")
         self.log_text.see("end")
         self.log_text.config(state="disabled")
 
