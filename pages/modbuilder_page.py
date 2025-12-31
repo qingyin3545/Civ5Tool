@@ -4,6 +4,7 @@ from i18n_manager import I18N
 import os, sys
 from civ5_mod_builder import Builder
 from utils.stdout_redirect import StdoutToLogger
+import threading
 
 class ModBuilderPage(tk.Frame):
     def __init__(self, parent):
@@ -142,10 +143,18 @@ class ModBuilderPage(tk.Frame):
         self.log(f"Project: {input_path}")
         self.log(f"Output: {output_path}")
 
-        # 在这里调用 civ5 mod builder 的 Python 构建逻辑
-        # ===== stdout 重定向 =====
+        # 禁用按钮防止重复点击
+        self.generate_button.config(state="disabled")
+
+        # 启动后台线程执行 Builder
+        thread = threading.Thread(target=self._run_builder, args=(input_path, output_path,))
+        thread.start()
+    
+    def _run_builder(self, input_path, output_path):
+        # 临时重定向 stdout 到日志
         old_stdout = sys.stdout
-        sys.stdout = StdoutToLogger(self.log, tag="builder")
+        sys.stdout = StdoutToLogger(self._thread_safe_log, tag="builder")
+        # 调用 civ5 mod builder 构建
         try:
             builder = Builder()
             result = builder.build(
@@ -160,8 +169,14 @@ class ModBuilderPage(tk.Frame):
             # 恢复输出重定向
             sys.stdout = old_stdout
 
-        # ===== 处理构建结果 =====
-        self.log(I18N.t("log.output_mod", mod_dir=result.mod_dir))
+        # 任务结束，更新 UI
+        self.after(0, lambda: self._on_builder_done(result.mod_dir))
+    def _thread_safe_log(self, message, tag=None):
+        # 调用主线程更新 log
+        self.after(0, lambda: self.log(message, tag))
+    def _on_builder_done(self, mod_dir):
+        self.log(I18N.t("log.output_mod", mod_dir=mod_dir))
+        self.generate_button.config(state="normal")
 
     # ===== 日志接口 =====
     def log(self, message: str, tag: str | None = None):
