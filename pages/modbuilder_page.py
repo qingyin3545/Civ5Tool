@@ -3,6 +3,7 @@ from tkinter import filedialog
 from i18n_manager import I18N
 import os, sys
 from civ5_mod_builder import Builder
+from civ5_paths import CIV5_DIR
 from utils.stdout_redirect import StdoutToLogger
 import threading
 
@@ -12,7 +13,7 @@ class ModBuilderPage(tk.Frame):
 
         # ===== 路径变量 =====
         self._input_path = tk.StringVar()
-        self._output_path = tk.StringVar()
+        self._output_path = tk.StringVar(value=os.path.join(CIV5_DIR, "MODS"))
 
         # ===== 输入文件路径 (.civ5proj) =====
         input_frame = tk.Frame(self)
