@@ -18,9 +18,9 @@ class CivToolApp(tk.Tk):
         self.translate_page = TranslationPage(self.notebook)
         self.modbuilder_page = ModBuilderPage(self.notebook)
 
-        self.notebook.add(self.basic_page, text=I18N.t("tab.basic"))
-        self.notebook.add(self.translate_page, text=I18N.t("tab.translate"))
-        self.notebook.add(self.modbuilder_page, text=I18N.t("tab.modbuilder_page"))
+        self.notebook.add(self.basic_page)
+        self.notebook.add(self.translate_page)
+        self.notebook.add(self.modbuilder_page)
 
         self.refresh_ui_language()
 
@@ -29,6 +29,7 @@ class CivToolApp(tk.Tk):
 
         self.notebook.tab(0, text=I18N.t("tab.basic"))
         self.notebook.tab(1, text=I18N.t("tab.translate"))
+        self.notebook.tab(2, text=I18N.t("tab.modbuilder_page"))
 
         self.basic_page.refresh_text()
         self.translate_page.refresh_text()
