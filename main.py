@@ -5,7 +5,7 @@ from pages.basic_page import BasicPage
 from pages.translate_page import TranslationPage
 from pages.modbuilder_page import ModBuilderPage
 from i18n_manager import I18N
-
+from utils.config_manager import config
 
 class CivToolApp(tk.Tk):
     def __init__(self):
@@ -34,9 +34,16 @@ class CivToolApp(tk.Tk):
         self.basic_page.refresh_text()
         self.translate_page.refresh_text()
         self.modbuilder_page.refresh_text()
+    
+    def on_close(self):
+        # ===== 窗口关闭回调 =====
+        config.save()
+        self.destroy()
 
 
 if __name__ == "__main__":
     app = CivToolApp()
+    # 2. 绑定关闭事件，在退出时保存配置
+    app.protocol("WM_DELETE_WINDOW", app.on_close)
     app.geometry("600x400")
     app.mainloop()
