@@ -36,4 +36,14 @@ class ConfigManager:
         with open(self.path, "w", encoding="utf-8") as f:
             self.config.write(f)
 
+    def delete_config(self):
+        # 删除磁盘中的配置文件
+        try:
+            if os.path.exists(self.path):
+                os.remove(self.path)
+                print("remove: ", self.path)
+            return True
+        except Exception:
+            return False
+
 config = ConfigManager("Civ5Tool.ini")

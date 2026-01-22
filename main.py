@@ -25,7 +25,7 @@ class CivToolApp(tk.Tk):
         self.refresh_ui_language()
 
     def refresh_ui_language(self):
-        self.title(I18N.t("app.title"))
+        self.title(I18N.t("app.title") + " v1.1")
 
         self.notebook.tab(0, text=I18N.t("tab.basic"))
         self.notebook.tab(1, text=I18N.t("tab.translate"))
@@ -37,7 +37,11 @@ class CivToolApp(tk.Tk):
     
     def on_close(self):
         # ===== 窗口关闭回调 =====
-        config.save()
+        if config.get_bool("BasicPage", "save_config", False):
+            config.save()
+        else:
+            config.delete_config()
+        
         self.destroy()
 
 

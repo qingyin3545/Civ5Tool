@@ -11,6 +11,9 @@ STRINGS = {
     "btn.toggle_game_lang": "Toggle Game Language",
     "btn.clear_cache": "Clear Cache",
     "btn.toggle_ui_lang": "Toggle UI Language",
+    "cb.auto_toggle_lang": "Auto Toggle Game Language",
+    "cb.auto_clear_cache": "Auto Clear Cache",
+    "cb.save_config": "Save Config File",
 
     #第二个页面
     "path.mod_path": "Mod Path:",

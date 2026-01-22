@@ -5,7 +5,7 @@ from tkinter import ttk, filedialog
 
 from civ5_paths import CIV5_DIR
 from i18n_manager import I18N
-
+from utils.config_manager import config
 
 class BasicPage(ttk.Frame):
     
@@ -13,12 +13,35 @@ class BasicPage(ttk.Frame):
         super().__init__(parent)
         self.civ5_path = tk.StringVar(value=CIV5_DIR)
         self._on_ui_lang_change = on_ui_lang_change
+
+        # 1. 从 config 读取勾选框
+        self.auto_toggle_lang = tk.BooleanVar(value=config.get_bool("BasicPage", "auto_toggle_lang", False))
+        self.auto_clear_cache = tk.BooleanVar(value=config.get_bool("BasicPage", "auto_clear_cache", False))
+        self.save_config = tk.BooleanVar(value=config.get_bool("BasicPage", "save_config", False))
+
+        # 2. 监听，状态改变时改变config
+        self.auto_toggle_lang.trace_add("write", lambda *args: (
+            config.set("BasicPage", "auto_toggle_lang", self.auto_toggle_lang.get()),
+            # 勾选时把保存配置文件也勾选上
+            self.auto_toggle_lang.get() and self.save_config.set(True)
+        ))
+        self.auto_clear_cache.trace_add("write", lambda *args: (
+            config.set("BasicPage", "auto_clear_cache", self.auto_clear_cache.get()),
+            self.auto_clear_cache.get() and self.save_config.set(True)
+        ))
+        self.save_config.trace_add("write", lambda *args: (
+            config.set("BasicPage", "save_config", self.save_config.get())
+        ))
+
         self._build_ui()
 
-    def _build_ui(self):
-        btn_frame = ttk.Frame(self)
-        btn_frame.pack(pady=10)
+        # 根据初始值执行函数
+        if self.auto_toggle_lang.get():
+            self.toggle_game_language()
+        if self.auto_clear_cache.get():
+            self.clear_cache()
 
+    def _build_ui(self):
         # ===== 路径选择区域 =====
         path_frame = tk.Frame(self)
         path_frame.pack(fill="x", padx=10, pady=(10, 5))
@@ -40,6 +63,8 @@ class BasicPage(ttk.Frame):
         )
         self.browse_button.pack(side="left")
 
+        btn_frame = ttk.Frame(self)
+        btn_frame.pack(pady=10)
         # ===== 游戏语言 =====
         self.btn_game_lang = ttk.Button(
             btn_frame,
@@ -60,6 +85,28 @@ class BasicPage(ttk.Frame):
             command=self.toggle_ui_language
         )
         self.btn_ui_lang.pack(side="left", padx=5)
+
+        # ===== 新增：勾选框区域 =====
+        check_frame = tk.Frame(self)
+        check_frame.pack(padx=10)
+
+        self.cb_auto_lang = ttk.Checkbutton(
+            check_frame,
+            variable=self.auto_toggle_lang
+        )
+        self.cb_auto_lang.pack(side="left", padx=5)
+
+        self.cb_auto_clear = ttk.Checkbutton(
+            check_frame,
+            variable=self.auto_clear_cache
+        )
+        self.cb_auto_clear.pack(side="left", padx=5)
+
+        self.cb_save_config = ttk.Checkbutton(
+            check_frame,
+            variable=self.save_config
+        )
+        self.cb_save_config.pack(side="left", padx=5)
 
         # ===== log输出 =====
         log_frame = tk.Frame(self)
@@ -93,6 +140,9 @@ class BasicPage(ttk.Frame):
         self.btn_game_lang.config(text=I18N.t("btn.toggle_game_lang"))
         self.btn_clear_cache.config(text=I18N.t("btn.clear_cache"))
         self.btn_ui_lang.config(text=I18N.t("btn.toggle_ui_lang"))
+        self.cb_auto_lang.config(text=I18N.t("cb.auto_toggle_lang"))
+        self.cb_auto_clear.config(text=I18N.t("cb.auto_clear_cache"))
+        self.cb_save_config.config(text=I18N.t("cb.save_config"))
 
     def log(self, msg):
         self.log_text.configure(state="normal")

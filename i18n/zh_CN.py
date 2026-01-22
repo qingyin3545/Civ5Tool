@@ -11,6 +11,9 @@ STRINGS = {
     "btn.toggle_game_lang": "切换游戏语言",
     "btn.clear_cache": "清理缓存",
     "btn.toggle_ui_lang": "切换工具语言",
+    "cb.auto_toggle_lang": "自动切换游戏语言",
+    "cb.auto_clear_cache": "自动清理缓存",
+    "cb.save_config": "保存配置文件",
 
     #第二个页面
     "path.mod_path": "模组路径:",
