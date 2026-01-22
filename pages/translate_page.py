@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
-from i18n_manager import I18N
+from i18n.i18n_manager import I18N
 # 文件查找
 import os
 import shutil

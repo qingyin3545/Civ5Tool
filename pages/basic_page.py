@@ -3,8 +3,8 @@ import shutil
 import tkinter as tk
 from tkinter import ttk, filedialog
 
-from civ5_paths import CIV5_DIR
-from i18n_manager import I18N
+from utils.civ5_paths import CIV5_DIR
+from i18n.i18n_manager import I18N
 from utils.config_manager import config
 
 class BasicPage(ttk.Frame):

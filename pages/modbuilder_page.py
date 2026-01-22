@@ -1,9 +1,9 @@
 import tkinter as tk
 from tkinter import filedialog
-from i18n_manager import I18N
+from i18n.i18n_manager import I18N
 import os, sys
 from civ5_mod_builder import Builder
-from civ5_paths import CIV5_DIR
+from utils.civ5_paths import CIV5_DIR
 from utils.stdout_redirect import StdoutToLogger
 import threading
 

@@ -4,7 +4,7 @@ from tkinter import ttk
 from pages.basic_page import BasicPage
 from pages.translate_page import TranslationPage
 from pages.modbuilder_page import ModBuilderPage
-from i18n_manager import I18N
+from i18n.i18n_manager import I18N
 from utils.config_manager import config
 
 class CivToolApp(tk.Tk):
